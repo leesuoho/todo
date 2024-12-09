@@ -9,7 +9,12 @@ import java.util.Optional;
 
 public interface TodoRepository {
     TodoResponseDto saveTodo(Todo todo);
+
     List<TodoResponseDto> findAllTodos(String authhor, LocalDate updatedDate);
+
     Optional<TodoResponseDto> findTodoById(Long id);
+
     int updatedTodo(Long id, String author, String password, String title);
+
+    int deleteTodo(Long id, String password);
 }

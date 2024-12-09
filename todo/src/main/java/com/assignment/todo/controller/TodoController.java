@@ -28,7 +28,7 @@ public class TodoController {
     @GetMapping
     public ResponseEntity<List<TodoResponseDto>> findAllTodos(
             @RequestParam(required = false) String author,
-            @RequestParam(required = false)LocalDate updatedDate) {
+            @RequestParam(required = false) LocalDate updatedDate) {
         return todoService.findAllTodos(author, updatedDate);
     }
 
@@ -40,5 +40,11 @@ public class TodoController {
     @PatchMapping("/{id}")
     public ResponseEntity<TodoResponseDto> updatedTodo(@PathVariable Long id, @RequestBody TodoRequestDto requestDto) {
         return new ResponseEntity<>(todoService.updatedTodo(id, requestDto.getAuthor(), requestDto.getPassword(), requestDto.getTitle()), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TodoResponseDto> deleteTodo(@PathVariable Long id, @RequestBody TodoRequestDto requestDto) {
+        todoService.deleteTodo(id, requestDto.getPassword());
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

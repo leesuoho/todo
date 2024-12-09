@@ -15,7 +15,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 @Repository
-public class JdbcTodoRepository implements TodoRepository{
+public class JdbcTodoRepository implements TodoRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -38,7 +38,8 @@ public class JdbcTodoRepository implements TodoRepository{
         Number key = simpleJdbcInsert.executeAndReturnKey(new MapSqlParameterSource(parameters));
         return new TodoResponseDto(key.longValue(), todo.getAuthor(), todo.getPassword(), todo.getTitle(), null, null);
     }
-//1. author와 updateDate가 존재
+
+    //1. author와 updateDate가 존재
 //2. author만 존재
 //3. updateDate만 존재
 //4. 둘 다 존재하지 않음(전체조회)
@@ -71,6 +72,7 @@ public class JdbcTodoRepository implements TodoRepository{
         List<TodoResponseDto> result = jdbcTemplate.query("select * from todo where id = ?", todoRowMapper(), id);
         return result.stream().findAny();
     }
+
     private RowMapper<TodoResponseDto> todoRowMapper() {
         return new RowMapper<TodoResponseDto>() {
             @Override
@@ -109,5 +111,10 @@ public class JdbcTodoRepository implements TodoRepository{
         params.add(password);
 
         return jdbcTemplate.update(queryStringBuilder.toString(), params.toArray());
+    }
+
+    @Override
+    public int deleteTodo(Long id, String password) {
+        return jdbcTemplate.update("DELETE FROM todo WHERE id = ? AND password = ?", id, password);
     }
 }

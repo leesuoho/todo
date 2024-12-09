@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TodoServiceImpl implements TodoService{
+public class TodoServiceImpl implements TodoService {
 
     private final TodoRepository todoRepository;
 
@@ -36,7 +36,8 @@ public class TodoServiceImpl implements TodoService{
         List<TodoResponseDto> allTodos = todoRepository.findAllTodos(author, updatedDate);
         return new ResponseEntity<>(allTodos, HttpStatus.OK);
     }
-//    Optional<Todo> findTodoById(Long id);
+
+    //    Optional<Todo> findTodoById(Long id);
     @Override
     public TodoResponseDto findTodoById(Long id) {
         Optional<TodoResponseDto> todoResponseDto = todoRepository.findTodoById(id);
@@ -52,10 +53,20 @@ public class TodoServiceImpl implements TodoService{
 
         int updatedRow = todoRepository.updatedTodo(id, author, password, title);
 
-        if(updatedRow == 0) {
+        if (updatedRow == 0) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No data has been modified.");
         }
 
         return todoRepository.findTodoById(id).get();
+    }
+
+    @Override
+    public void deleteTodo(Long id, String password) {
+
+        int deleteRow = todoRepository.deleteTodo(id, password);
+
+        if (deleteRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Does not exist id = " + id);
+        }
     }
 }
