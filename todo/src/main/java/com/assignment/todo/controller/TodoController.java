@@ -31,4 +31,9 @@ public class TodoController {
             @RequestParam(required = false)LocalDate updatedDate) {
         return todoService.findAllTodos(author, updatedDate);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<TodoResponseDto> findTodoById(@PathVariable Long id) {
+        return new ResponseEntity<>(todoService.findTodoById(id), HttpStatus.OK);
+    }
 }

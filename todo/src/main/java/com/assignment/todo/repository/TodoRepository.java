@@ -5,8 +5,10 @@ import com.assignment.todo.entity.Todo;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface TodoRepository {
     TodoResponseDto saveTodo(Todo todo);
     List<TodoResponseDto> findAllTodos(String authhor, LocalDate updatedDate);
+    Optional<TodoResponseDto> findTodoById(Long id);
 }

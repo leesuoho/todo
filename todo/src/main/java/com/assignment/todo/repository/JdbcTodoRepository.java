@@ -65,6 +65,12 @@ public class JdbcTodoRepository implements TodoRepository{
 //        jdbcTemplate.query(String sql쿼리, Object[] sql쿼리 ?에 들어갈 값들, RowMapper<T> ResultSet을 매핑해 원하는 객체로 변환);
         return jdbcTemplate.query(queryStringBuilder.toString(), params.toArray(), todoRowMapper());
     }
+
+    @Override
+    public Optional<TodoResponseDto> findTodoById(Long id) {
+        List<TodoResponseDto> result = jdbcTemplate.query("select * from todo where id = ?", todoRowMapper(), id);
+        return result.stream().findAny();
+    }
     private RowMapper<TodoResponseDto> todoRowMapper() {
         return new RowMapper<TodoResponseDto>() {
             @Override

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TodoServiceImpl implements TodoService{
@@ -32,5 +33,11 @@ public class TodoServiceImpl implements TodoService{
     public ResponseEntity<List<TodoResponseDto>> findAllTodos(String author, LocalDate updatedDate) {
         List<TodoResponseDto> allTodos = todoRepository.findAllTodos(author, updatedDate);
         return new ResponseEntity<>(allTodos, HttpStatus.OK);
+    }
+//    Optional<Todo> findTodoById(Long id);
+    @Override
+    public TodoResponseDto findTodoById(Long id) {
+        Optional<TodoResponseDto> todoResponseDto = todoRepository.findTodoById(id);
+        return todoResponseDto.get();
     }
 }
