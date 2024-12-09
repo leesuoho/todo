@@ -36,4 +36,9 @@ public class TodoController {
     public ResponseEntity<TodoResponseDto> findTodoById(@PathVariable Long id) {
         return new ResponseEntity<>(todoService.findTodoById(id), HttpStatus.OK);
     }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<TodoResponseDto> updatedTodo(@PathVariable Long id, @RequestBody TodoRequestDto requestDto) {
+        return new ResponseEntity<>(todoService.updatedTodo(id, requestDto.getAuthor(), requestDto.getPassword(), requestDto.getTitle()), HttpStatus.OK);
+    }
 }

@@ -7,7 +7,9 @@ import com.assignment.todo.repository.TodoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -39,5 +41,21 @@ public class TodoServiceImpl implements TodoService{
     public TodoResponseDto findTodoById(Long id) {
         Optional<TodoResponseDto> todoResponseDto = todoRepository.findTodoById(id);
         return todoResponseDto.get();
+    }
+
+    @Transactional
+    @Override
+    public TodoResponseDto updatedTodo(Long id, String author, String password, String title) {
+        if (author == null && title == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The author and title are required values.");
+        }
+
+        int updatedRow = todoRepository.updatedTodo(id, author, password, title);
+
+        if(updatedRow == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No data has been modified.");
+        }
+
+        return todoRepository.findTodoById(id).get();
     }
 }

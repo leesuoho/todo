@@ -86,4 +86,28 @@ public class JdbcTodoRepository implements TodoRepository{
             }
         };
     }
+
+    @Override
+    public int updatedTodo(Long id, String author, String password, String title) {
+        StringBuilder queryStringBuilder = new StringBuilder("UPDATE todo SET ");
+        List<Object> params = new ArrayList<>();
+
+        if (author != null && title != null) {
+            queryStringBuilder.append("author = ?, title = ? ");
+            params.add(author);
+            params.add(title);
+        } else if (author != null && title == null) {
+            queryStringBuilder.append("author = ? ");
+            params.add(author);
+        } else if (author == null && title != null) {
+            queryStringBuilder.append("title = ? ");
+            params.add(title);
+        }
+
+        queryStringBuilder.append("WHERE id = ? AND password = ?");
+        params.add(id);
+        params.add(password);
+
+        return jdbcTemplate.update(queryStringBuilder.toString(), params.toArray());
+    }
 }
