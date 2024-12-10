@@ -14,15 +14,24 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
-@Repository
+@Repository //데이터 접근 계층
 public class JdbcTodoRepository implements TodoRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
+    /**
+     * 생성자를 통해 JdbcTemplate을 초기화
+     * @param dataSource 데이터 소스
+     */
     public JdbcTodoRepository(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
+    /**
+     * 새로운 할 일을 저장
+     * @param todo 저장할 할 일 엔티티
+     * @return 저장된 할 일의 정보
+     */
     @Override
     public TodoResponseDto saveTodo(Todo todo) {
         SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate);
@@ -39,11 +48,12 @@ public class JdbcTodoRepository implements TodoRepository {
         return new TodoResponseDto(key.longValue(), todo.getAuthor(), todo.getPassword(), todo.getTitle(), null, null);
     }
 
-    //1. author와 updateDate가 존재
-//2. author만 존재
-//3. updateDate만 존재
-//4. 둘 다 존재하지 않음(전체조회)
-//    " WHERE name = ? AND DATE(editDate) = ?"
+    /**
+     * 모든 할 일을 조회. 작성자나 업데이트 날짜로 필터링할 수 있다.
+     * @param author 작성자 이름
+     * @param updatedDate 업데이트 날짜
+     * @return 필터링된 할 일 목록
+     */
     @Override
     public List<TodoResponseDto> findAllTodos(String author, LocalDate updatedDate) {
         List<TodoResponseDto> todoResponseDtos = new ArrayList<>();
@@ -63,16 +73,25 @@ public class JdbcTodoRepository implements TodoRepository {
         }
 
         queryStringBuilder.append(" ORDER BY updatedDate DESC");
-//        jdbcTemplate.query(String sql쿼리, Object[] sql쿼리 ?에 들어갈 값들, RowMapper<T> ResultSet을 매핑해 원하는 객체로 변환);
+//      jdbcTemplate.query(String sql쿼리, Object[] sql쿼리 ?에 들어갈 값들, RowMapper<T> ResultSet을 매핑해 원하는 객체로 변환);
         return jdbcTemplate.query(queryStringBuilder.toString(), params.toArray(), todoRowMapper());
     }
 
+    /**
+     * 특정 ID의 할 일을 조회
+     * @param id 조회하려는 할 일의 ID
+     * @return 해당 할 일의 정보
+     */
     @Override
     public Optional<TodoResponseDto> findTodoById(Long id) {
         List<TodoResponseDto> result = jdbcTemplate.query("select * from todo where id = ?", todoRowMapper(), id);
         return result.stream().findAny();
     }
 
+    /**
+     * ResultSet을 TodoResponseDto 객체로 매핑
+     * @return RowMapper<TodoResponseDto> 객체
+     */
     private RowMapper<TodoResponseDto> todoRowMapper() {
         return new RowMapper<TodoResponseDto>() {
             @Override
@@ -89,6 +108,14 @@ public class JdbcTodoRepository implements TodoRepository {
         };
     }
 
+    /**
+     * 할 일을 업데이트
+     * @param id 업데이트하려는 할 일의 ID
+     * @param author 새로운 작성자 이름
+     * @param password 비밀번호
+     * @param title 새로운 할 일 제목
+     * @return 업데이트된 행 수
+     */
     @Override
     public int updatedTodo(Long id, String author, String password, String title) {
         StringBuilder queryStringBuilder = new StringBuilder("UPDATE todo SET ");
@@ -113,6 +140,12 @@ public class JdbcTodoRepository implements TodoRepository {
         return jdbcTemplate.update(queryStringBuilder.toString(), params.toArray());
     }
 
+    /**
+     * 특정 ID의 할 일을 삭제
+     * @param id 삭제하려는 할 일의 ID
+     * @param password 비밀번호
+     * @return 삭제된 행 수
+     */
     @Override
     public int deleteTodo(Long id, String password) {
         return jdbcTemplate.update("DELETE FROM todo WHERE id = ? AND password = ?", id, password);
